@@ -1,8 +1,8 @@
-# mountstats
+# pyostat
 
-A simple command line script for logging read/write data for various IPs.
+A simple command line script for logging read/write RTT stats for various Linux mount points.
 
 # Usage
 ``` bash
-    $ ./nfs-iostat.py 5 | python mountstats.py
+    $ ./nfs-iostat.py 5 | pyostat
 ```
