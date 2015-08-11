@@ -30,7 +30,7 @@ def get_curr_ip(ip_block):
 	curr_ip = ip_block.split(':')[0]
 	if curr_ip not in all_ips: # If this IP hasn't been seen yet
 		all_ips.append(curr_ip) # Make note that we've seen it
-		avgs[curr_ip] = [[], [], [], []] #read_vals, read_avg, write_vals, write_avg
+		avgs[curr_ip] = [[], [], [], []] # read_vals, read_avg, write_vals, write_avg
 		new_file = open(str(curr_ip) + '.out', 'a') # Create an output file named IP.out
 		out_files[new_file.name] = new_file
 	return curr_ip
