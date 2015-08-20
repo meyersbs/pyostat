@@ -1,0 +1,5 @@
+#!/bin/sh
+
+rm *.out
+rm *~
+echo "Cleaned Working Directory!"

@@ -1,0 +1,30 @@
+#!/bin/sh
+
+./pyostat 2 2 #>/dev/null
+date +"%r | Test 1 Passed"
+./pyostat 2 2 -v #>/dev/null
+date +"%r | Test 2 Passed"
+./pyostat 2 2 -q #>/dev/null
+date +"%r | Test 3 Passed"
+./pyostat 2 2 -v -q #>/dev/null
+date +"%r | Test 4 Passed"
+./pyostat 2 2 -q -v #>/dev/null
+date +"%r | Test 5 Passed"
+./pyostat 2 2 -v -v #>/dev/null
+date +"%r | Test 6 Passed"
+./pyostat 2 2 -q -q #>/dev/null
+date +"%r | Test 7 Passed"
+./pyostat 2 2 -d #>/dev/null
+date +"%r | Test 8 Should Fail"
+./pyostat 2 2 -q -d #>/dev/null
+date +"%r | Test 9 Should Fail"
+./pyostat 2 2 -v -d #>/dev/null
+date +"%r | Test 10 Should Fail"
+./pyostat 2 2 -d -q #>/dev/null
+date +"%r | Test 11 Should Fail"
+./pyostat 2 2 -d -v #>/dev/null
+date +"%r | Test 12 Should Fail"
+./pyostat 2 2 -d -d #>/dev/null
+date +"%r | Test 13 Should Fail"
+./pyostat 2 2 -q -v -q #>/dev/null
+date +"%r | Test 14 Should Fail"

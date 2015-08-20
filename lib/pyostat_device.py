@@ -41,6 +41,7 @@ collecting = True
 all_output_file = open('all_ip_mounts.out', 'a')
 out_files['127.0.0.1'] = all_output_file
 verbose_line = '##### BEGIN VERBOSE OUTPUT #####\n'
+standard_line = '##### BEGIN STANDARD OUTPUT #####\n'
 
 
 ########################################################################################################################
@@ -74,14 +75,16 @@ def calculate_data(timestamp):
 
 # Appends a line of Pipe-Separated-Values to the appropriate output file.
 def print_to_file():
-	global out_files, out_data
+	global out_files, out_data, standard_line
 	for key in sorted(out_data):
-		line = (out_data[key][0] + '|' + out_data[key][1] + str(len(out_data[key][6])) + '|' +
-				out_data[key][2] + '|' + out_data[key][3] + '|' + out_data[key][4] + '|' +
-				out_data[key][5] + '\n')
-		out_files[str(key) + '.out'].write(line)
+		standard_line += (out_data[key][0] + '|' + out_data[key][1] + '|' + str(len(out_data[key][6])) +
+						 '|' + out_data[key][2] + '|' + out_data[key][3] + '|' + out_data[key][4] +
+						 '|' + out_data[key][5] + '\n')
+		out_files[str(key) + '.out'].write(standard_line)
 		if not pyostat_functions.verbose_seen:
-			out_files['127.0.0.1'].write(line)
+			out_files['127.0.0.1'].write(standard_line)
+
+		standard_line = ''
 
 
 # Prints pretty-looking output to stdout.
@@ -194,7 +197,7 @@ class DeviceData:
 
 	# Print generics stats for one RPC.
 	def __print_rpc_op_stats(self, op, verbose, display, timestamp):
-		global curr_read_retrans, curr_write_retrans, curr_read_rtt, curr_write_rtt, out_files, verbose_line
+		global curr_read_retrans, curr_write_retrans, curr_read_rtt, curr_write_rtt, out_files, verbose_line, standard_line
 		if op not in self.__rpc_data:
 			return
 
@@ -217,19 +220,31 @@ class DeviceData:
 			if display and verbose:
 				print('\n%s mounted on %s:' % (self.__nfs_data['ip_address'], self.__nfs_data['mount_point']))
 				print('\nREAD:\t\tretrans:\tavg RTT:\n\t' + str(curr_read_retrans) + str(curr_read_rtt))
-				verbose_line += str(timestamp) + '|' + self.__nfs_data['ip_address'].split(':')[0] + '|' + str(curr_read_rtt).lstrip()
+				verbose_line += (str(timestamp) + '|' + self.__nfs_data['ip_address'].split(':')[0] + '|' +
+								str(len(out_data[curr_ip][6])) + '|' + str(curr_read_rtt).lstrip())
+			elif display:
+				print('\n%s mounted on %s:' % (self.__nfs_data['ip_address'], self.__nfs_data['mount_point']))
+				print('\nREAD:\t\tretrans:\tavg RTT:\n\t' + str(curr_read_retrans) + str(curr_read_rtt))
+				standard_line += (str(timestamp) + '|' + self.__nfs_data['ip_address'].split(':')[0] + '|' +
+								str(len(out_data[curr_ip][6])) + '|' + str(curr_read_rtt).lstrip())
 			elif verbose:
-				verbose_line += str(timestamp) + '|' + self.__nfs_data['ip_address'].split(':')[0] + '|' + str(curr_read_rtt).lstrip()
+				verbose_line += (str(timestamp) + '|' + self.__nfs_data['ip_address'].split(':')[0] + '|' +
+								str(len(out_data[curr_ip][6])) + '|' + str(curr_read_rtt).lstrip())
 		elif op.lower() == 'write:':
 			curr_write_retrans = format(retransmits, '>16')
 			curr_write_rtt = format(rtt_per_op, '>16.3f')
 			if display and verbose:
 				print('\nWRITE:\t\tretrans:\tavg RTT:\n\t' + str(curr_write_retrans) + str(curr_write_rtt))
-				verbose_line += '|' + str(curr_write_rtt).lstrip() + '|' + str(curr_read_retrans).lstrip() + '|' + str(curr_write_retrans).lstrip()
+				verbose_line += '|' + str(curr_write_rtt).lstrip() + '|' + str(curr_read_retrans).lstrip() + '|' + str(curr_write_retrans).lstrip() + '\n'
 				out_files['127.0.0.1'].write(verbose_line)
 				verbose_line = ''
-			if verbose:
-				verbose_line += '|' + str(curr_write_rtt).lstrip() + '|' + str(curr_read_retrans).lstrip() + '|' + str(curr_write_retrans).lstrip()
+			elif display:
+				print('\nWRITE:\t\tretrans:\tavg RTT:\n\t' + str(curr_write_retrans) + str(curr_write_rtt))
+				standard_line += '|' + str(curr_write_rtt).lstrip() + '|' + str(curr_read_retrans).lstrip() + '|' + str(curr_write_retrans).lstrip() + '\n'
+				out_files['127.0.0.1'].write(standard_line)
+				standard_line = ''
+			elif verbose:
+				verbose_line += '|' + str(curr_write_rtt).lstrip() + '|' + str(curr_read_retrans).lstrip() + '|' + str(curr_write_retrans).lstrip() + '\n'
 				out_files['127.0.0.1'].write(verbose_line)
 				verbose_line = ''
 

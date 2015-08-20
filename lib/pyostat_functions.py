@@ -49,6 +49,12 @@ pyostat_version = 'Pyostat v%s' % curr_version
 verbose_seen, display_output = False, True
 
 
+class ModifiedOptionParser(OptionParser):
+	def error(self, msg):
+		print("Ignoring Unknown Option. Try '--help' for usage information.")
+		pass
+
+
 ########################################################################################################################
 # FUNCTIONS ############################################################################################################
 ########################################################################################################################
@@ -141,7 +147,7 @@ def iostat_command():
 	interval_seen, count_seen, verbose_seen, display_output = False, False, False, True
 
 	# Setup command line argument parser.
-	parser = OptionParser(usage=usage_statement, description=description, version=pyostat_version)
+	parser = ModifiedOptionParser(usage=usage_statement, description=description, version=pyostat_version)
 	parser.set_defaults(which=0, sort=False, list=sys.maxsize)
 
 	display_group = OptionGroup(parser, "Display Options",

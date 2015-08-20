@@ -49,7 +49,7 @@ def main():
 
 	if verbose_seen:
 		out_files['127.0.0.1'].write('###### END VERBOSE OUTPUT ######\n')
-	sys.exit(0)
+		sys.exit(0)
 
 
 if __name__ == "__main__":
