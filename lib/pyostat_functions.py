@@ -27,7 +27,7 @@ MA 02110-1301 USA
 """
 
 ########################################################################################################################
-# IMPORTS ##############################################################################################################
+# IMPORTS & GLOBAL VARIABLES ###########################################################################################
 ########################################################################################################################
 import sys
 import time
@@ -37,10 +37,6 @@ from optparse import OptionParser, OptionGroup
 from pyostat_device import DeviceData
 import pyostat_device
 
-
-########################################################################################################################
-# GLOBAL VARIABLES #####################################################################################################
-########################################################################################################################
 curr_version = '1.0'
 mountstats_path = '/proc/self/mountstats'
 usage_statement = "%prog [ <interval> ] [ <count> ] [ <option> ] [ <option> ]\n"
@@ -53,6 +49,9 @@ pyostat_version = 'Pyostat v%s' % curr_version
 verbose_seen, display_output = False, True
 
 
+########################################################################################################################
+# FUNCTIONS ############################################################################################################
+########################################################################################################################
 # Generates a dictionary of statistics for the specified file.
 def parse_stats_file(filename):
 	mountstats_dict = dict()
@@ -135,7 +134,7 @@ def list_nfs_mounts(list_param, mountstats):
 
 
 # Parses command line arguments. Sends the command to gather statistics.
-def iostat_command(name):
+def iostat_command():
 	global verbose_seen, display_output
 	mountstats = parse_stats_file(mountstats_path)
 	original_devices = []
@@ -146,8 +145,8 @@ def iostat_command(name):
 	parser.set_defaults(which=0, sort=False, list=sys.maxsize)
 
 	display_group = OptionGroup(parser, "Display Options",
-							    "Standard output is displayed in stdout unless '-d' is specified.")
-	display_group.add_option('-d', '--display', action="store_const", dest="which", const=1,
+							    "Standard output is displayed in stdout unless '-q' is specified.")
+	display_group.add_option('-q', '--quiet', action="store_const", dest="which", const=1,
 							 help="disables all output to stdout")
 	parser.add_option_group(display_group)
 	verbose_group = OptionGroup(parser, "Verbose Options",
@@ -165,17 +164,17 @@ def iostat_command(name):
 			continue
 
 		# Parses command line options.
-		if len(sys.argv) == 3 and sys.argv[2] == '-d':
+		if len(sys.argv) == 3 and sys.argv[2] == '-q':
 			display_output = False
 			verbose_seen = False
 		elif len(sys.argv) == 3 and sys.argv[2] == '-v':
 			verbose_seen = True
-		elif len(sys.argv) == 4 and sys.argv[3] == '-d':
+		elif len(sys.argv) == 4 and sys.argv[3] == '-q':
 			display_output = False
 			verbose_seen = False
 		elif len(sys.argv) == 4 and sys.argv[3] == '-v':
 			verbose_seen = True
-		elif len(sys.argv) == 5 and (sys.argv[3] == '-d' or sys.argv[4] == '-d'):
+		elif len(sys.argv) == 5 and (sys.argv[3] == '-q' or sys.argv[4] == '-q'):
 			display_output = False
 			if sys.argv[3] == '-v' or sys.argv[4] == '-v':
 				verbose_seen = True

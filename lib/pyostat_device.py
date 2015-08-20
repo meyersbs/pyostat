@@ -29,15 +29,11 @@ MA 02110-1301 USA
 """
 
 ########################################################################################################################
-# IMPORTS ##############################################################################################################
+# IMPORTS & GLOBAL VARIABLES ###########################################################################################
 ########################################################################################################################
 import sys, re
 import pyostat_functions
 
-
-########################################################################################################################
-# GLOBAL VARIABLES #####################################################################################################
-########################################################################################################################
 curr_read_retrans, curr_write_retrans, curr_read_rtt, curr_write_rtt, curr_ip = '', '', '', '', ''
 seen_ips = []
 avgs, out_files, out_data = {}, {}, {}
@@ -80,8 +76,9 @@ def calculate_data(timestamp):
 def print_to_file():
 	global out_files, out_data
 	for key in sorted(out_data):
-		line = (out_data[key][0] + '|' + out_data[key][1] + '|' + out_data[key][2] + '|' +
-			    out_data[key][3] + '|' + out_data[key][4] + '|' + out_data[key][5] + '\n')
+		line = (out_data[key][0] + '|' + out_data[key][1] + str(len(out_data[key][6])) + '|' +
+				out_data[key][2] + '|' + out_data[key][3] + '|' + out_data[key][4] + '|' +
+				out_data[key][5] + '\n')
 		out_files[str(key) + '.out'].write(line)
 		if not pyostat_functions.verbose_seen:
 			out_files['127.0.0.1'].write(line)
@@ -229,11 +226,11 @@ class DeviceData:
 			if display and verbose:
 				print('\nWRITE:\t\tretrans:\tavg RTT:\n\t' + str(curr_write_retrans) + str(curr_write_rtt))
 				verbose_line += '|' + str(curr_write_rtt).lstrip() + '|' + str(curr_read_retrans).lstrip() + '|' + str(curr_write_retrans).lstrip()
-				out_files['127.0.0.1'].write(verbose_line + '\n')
+				out_files['127.0.0.1'].write(verbose_line)
 				verbose_line = ''
 			if verbose:
 				verbose_line += '|' + str(curr_write_rtt).lstrip() + '|' + str(curr_read_retrans).lstrip() + '|' + str(curr_write_retrans).lstrip()
-				out_files['127.0.0.1'].write(verbose_line + '\n')
+				out_files['127.0.0.1'].write(verbose_line)
 				verbose_line = ''
 
 	# Gets the current IP and checks if it has been seen in this iteration. If it hasn't, makes note of it and sets up

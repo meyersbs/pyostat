@@ -41,7 +41,7 @@ from lib.pyostat_device import out_files
 def main():
 	prog = os.path.basename(sys.argv[0])
 	try:
-		iostat_command(prog)
+		iostat_command()
 	except KeyboardInterrupt:
 		print('Caught ^C... exiting...')
 		out_files['127.0.0.1'].write('###### END VERBOSE OUTPUT ######\n')
