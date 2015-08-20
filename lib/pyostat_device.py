@@ -38,10 +38,11 @@ curr_read_retrans, curr_write_retrans, curr_read_rtt, curr_write_rtt, curr_ip = 
 seen_ips = []
 avgs, out_files, out_data = {}, {}, {}
 collecting = True
-all_output_file = open('all_ip_mounts.out', 'a')
+PATH = '/var/log/pyostat/'
+all_output_file = open(PATH + 'all_ip_mounts.out', 'a')
 out_files['127.0.0.1'] = all_output_file
-verbose_line = '##### BEGIN VERBOSE OUTPUT #####\n'
-standard_line = '##### BEGIN STANDARD OUTPUT #####\n'
+VERBOSE_LINE = '##### BEGIN VERBOSE OUTPUT #####\n'
+STANDARD_LINE = '##### BEGIN STANDARD OUTPUT #####\n'
 
 
 ########################################################################################################################
@@ -57,6 +58,12 @@ def start_collecting():
 def stop_collecting():
 	global collecting
 	collecting = False
+
+
+# Sets a new PATH.
+def set_path(new_path):
+	global PATH
+	PATH = new_path
 
 
 # Calculates averages for all of the read/write statistics.
@@ -75,16 +82,16 @@ def calculate_data(timestamp):
 
 # Appends a line of Pipe-Separated-Values to the appropriate output file.
 def print_to_file():
-	global out_files, out_data, standard_line
+	global out_files, out_data, STANDARD_LINE
 	for key in sorted(out_data):
-		standard_line += (out_data[key][0] + '|' + out_data[key][1] + '|' + str(len(out_data[key][6])) +
+		STANDARD_LINE += (out_data[key][0] + '|' + out_data[key][1] + '|' + str(len(out_data[key][6])) +
 						 '|' + out_data[key][2] + '|' + out_data[key][3] + '|' + out_data[key][4] +
 						 '|' + out_data[key][5] + '\n')
-		out_files[str(key) + '.out'].write(standard_line)
+		out_files[str(key) + '.out'].write(STANDARD_LINE)
 		if not pyostat_functions.verbose_seen:
-			out_files['127.0.0.1'].write(standard_line)
+			out_files['127.0.0.1'].write(STANDARD_LINE)
 
-		standard_line = ''
+		STANDARD_LINE = ''
 
 
 # Prints pretty-looking output to stdout.
@@ -198,7 +205,7 @@ class DeviceData:
 	# Print generics stats for one RPC.
 	def __print_rpc_op_stats(self, op, verbose, display, timestamp):
 		global curr_read_retrans, curr_write_retrans, curr_read_rtt, curr_write_rtt
-		global out_files, verbose_line, standard_line
+		global out_files, VERBOSE_LINE, STANDARD_LINE
 		if op not in self.__rpc_data:
 			return
 
@@ -221,48 +228,48 @@ class DeviceData:
 			if display and verbose:
 				print('\n%s mounted on %s:' % (self.__nfs_data['ip_address'], self.__nfs_data['mount_point']))
 				print('\nREAD:\t\tretrans:\tavg RTT:\n\t' + str(curr_read_retrans) + str(curr_read_rtt))
-				verbose_line += (str(timestamp) + '|' + self.__nfs_data['ip_address'].split(':')[0] + '|' +
+				VERBOSE_LINE += (str(timestamp) + '|' + self.__nfs_data['ip_address'].split(':')[0] + '|' +
 								str(len(out_data[curr_ip][6])) + '|' + str(curr_read_rtt).lstrip())
 			elif display:
 				print('\n%s mounted on %s:' % (self.__nfs_data['ip_address'], self.__nfs_data['mount_point']))
 				print('\nREAD:\t\tretrans:\tavg RTT:\n\t' + str(curr_read_retrans) + str(curr_read_rtt))
-				standard_line += (str(timestamp) + '|' + self.__nfs_data['ip_address'].split(':')[0] + '|' +
+				STANDARD_LINE += (str(timestamp) + '|' + self.__nfs_data['ip_address'].split(':')[0] + '|' +
 								str(len(out_data[curr_ip][6])) + '|' + str(curr_read_rtt).lstrip())
 			elif verbose:
-				verbose_line += (str(timestamp) + '|' + self.__nfs_data['ip_address'].split(':')[0] + '|' +
+				VERBOSE_LINE += (str(timestamp) + '|' + self.__nfs_data['ip_address'].split(':')[0] + '|' +
 								str(len(out_data[curr_ip][6])) + '|' + str(curr_read_rtt).lstrip())
 		elif op.lower() == 'write:':
 			curr_write_retrans = format(retransmits, '>16')
 			curr_write_rtt = format(rtt_per_op, '>16.3f')
 			if display and verbose:
 				print('\nWRITE:\t\tretrans:\tavg RTT:\n\t' + str(curr_write_retrans) + str(curr_write_rtt))
-				verbose_line += ('|' + str(curr_write_rtt).lstrip() + '|' + str(curr_read_retrans).lstrip() + '|' +
+				VERBOSE_LINE += ('|' + str(curr_write_rtt).lstrip() + '|' + str(curr_read_retrans).lstrip() + '|' +
 								str(curr_write_retrans).lstrip() + '\n')
-				out_files['127.0.0.1'].write(verbose_line)
-				verbose_line = ''
+				out_files['127.0.0.1'].write(VERBOSE_LINE)
+				VERBOSE_LINE = ''
 			elif display:
 				print('\nWRITE:\t\tretrans:\tavg RTT:\n\t' + str(curr_write_retrans) + str(curr_write_rtt))
-				standard_line += ('|' + str(curr_write_rtt).lstrip() + '|' + str(curr_read_retrans).lstrip() + '|' +
+				STANDARD_LINE += ('|' + str(curr_write_rtt).lstrip() + '|' + str(curr_read_retrans).lstrip() + '|' +
 								 str(curr_write_retrans).lstrip() + '\n')
-				out_files['127.0.0.1'].write(standard_line)
-				standard_line = ''
+				out_files['127.0.0.1'].write(STANDARD_LINE)
+				STANDARD_LINE = ''
 			elif verbose:
-				verbose_line += ('|' + str(curr_write_rtt).lstrip() + '|' + str(curr_read_retrans).lstrip() + '|' +
+				VERBOSE_LINE += ('|' + str(curr_write_rtt).lstrip() + '|' + str(curr_read_retrans).lstrip() + '|' +
 								str(curr_write_retrans).lstrip() + '\n')
-				out_files['127.0.0.1'].write(verbose_line)
-				verbose_line = ''
+				out_files['127.0.0.1'].write(VERBOSE_LINE)
+				VERBOSE_LINE = ''
 
 	# Gets the current IP and checks if it has been seen in this iteration. If it hasn't, makes note of it and sets up
 	# related variables/objects. Sets the global curr_ip to the current IP and returns it.
 	def __set_curr_ip(self):
-		global curr_ip, seen_ips, avgs, out_files, out_data, seen_ips
+		global curr_ip, seen_ips, avgs, out_files, out_data, seen_ips, PATH
 		curr_ip = self.__nfs_data['ip_address'].split(':')[0]
 		if curr_ip not in seen_ips:
 			seen_ips.append(curr_ip)
 			avgs[curr_ip] = [0, 0, 0, 0, 0]
 			out_data[str(curr_ip)] = ['', '', '', '', '', '', []]
 			out_data[str(curr_ip)][6].append(str(self.__nfs_data['mount_point']).split('/')[-1])
-			new_file = open(str(curr_ip) + '.out', 'a')
+			new_file = open(PATH + str(curr_ip) + '.out', 'a')
 			out_files[new_file.name] = new_file
 		else:
 			if str(self.__nfs_data['mount_point']).split('/')[-1] not in out_data[str(curr_ip)][6]:

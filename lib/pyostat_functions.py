@@ -140,7 +140,7 @@ def list_nfs_mounts(list_param, mountstats):
 
 
 # Parses command line arguments. Sends the command to gather statistics.
-def iostat_command():
+def iostat_command(prog):
 	global verbose_seen, display_output
 	mountstats = parse_stats_file(mountstats_path)
 	original_devices = []

@@ -29,19 +29,24 @@ MA 02110-1301 USA
 ########################################################################################################################
 # IMPORTS ##############################################################################################################
 ########################################################################################################################
-import sys
-import os
+import sys, os
 from lib.pyostat_functions import iostat_command, verbose_seen, display_output
-from lib.pyostat_device import out_files
+from lib.pyostat_device import out_files, set_path
 
 
 ########################################################################################################################
 # MAIN #################################################################################################################
 ########################################################################################################################
 def main():
+	last_arg = sys.argv[-1]
+	if os.path.isdir(last_arg) or last_arg == '':
+		if last_arg != '' and last_arg[-1] != '/':
+			last_arg += '/'
+		set_path(last_arg)
+
 	prog = os.path.basename(sys.argv[0])
 	try:
-		iostat_command()
+		iostat_command(prog)
 	except KeyboardInterrupt:
 		print('Caught ^C... exiting...')
 		if verbose_seen:
