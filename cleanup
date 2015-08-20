@@ -2,4 +2,11 @@
 
 rm *.out
 rm *~
+rm *.pyc
+rm lib/*.out
+rm lib/*~
+rm lib/*.pyc
+rm ref/*.out
+rm ref/*~
+rm ref/*.pyc
 echo "Cleaned Working Directory!"

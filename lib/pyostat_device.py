@@ -87,7 +87,7 @@ def print_to_file():
 		STANDARD_LINE += (out_data[key][0] + '|' + out_data[key][1] + '|' + str(len(out_data[key][6])) +
 						 '|' + out_data[key][2] + '|' + out_data[key][3] + '|' + out_data[key][4] +
 						 '|' + out_data[key][5] + '\n')
-		out_files[str(key) + '.out'].write(STANDARD_LINE)
+		out_files[PATH + str(key) + '.out'].write(STANDARD_LINE)
 		if not pyostat_functions.verbose_seen:
 			out_files['127.0.0.1'].write(STANDARD_LINE)
 
