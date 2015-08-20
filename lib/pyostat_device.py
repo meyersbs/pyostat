@@ -197,7 +197,8 @@ class DeviceData:
 
 	# Print generics stats for one RPC.
 	def __print_rpc_op_stats(self, op, verbose, display, timestamp):
-		global curr_read_retrans, curr_write_retrans, curr_read_rtt, curr_write_rtt, out_files, verbose_line, standard_line
+		global curr_read_retrans, curr_write_retrans, curr_read_rtt, curr_write_rtt
+		global out_files, verbose_line, standard_line
 		if op not in self.__rpc_data:
 			return
 
@@ -235,16 +236,19 @@ class DeviceData:
 			curr_write_rtt = format(rtt_per_op, '>16.3f')
 			if display and verbose:
 				print('\nWRITE:\t\tretrans:\tavg RTT:\n\t' + str(curr_write_retrans) + str(curr_write_rtt))
-				verbose_line += '|' + str(curr_write_rtt).lstrip() + '|' + str(curr_read_retrans).lstrip() + '|' + str(curr_write_retrans).lstrip() + '\n'
+				verbose_line += ('|' + str(curr_write_rtt).lstrip() + '|' + str(curr_read_retrans).lstrip() + '|' +
+								str(curr_write_retrans).lstrip() + '\n')
 				out_files['127.0.0.1'].write(verbose_line)
 				verbose_line = ''
 			elif display:
 				print('\nWRITE:\t\tretrans:\tavg RTT:\n\t' + str(curr_write_retrans) + str(curr_write_rtt))
-				standard_line += '|' + str(curr_write_rtt).lstrip() + '|' + str(curr_read_retrans).lstrip() + '|' + str(curr_write_retrans).lstrip() + '\n'
+				standard_line += ('|' + str(curr_write_rtt).lstrip() + '|' + str(curr_read_retrans).lstrip() + '|' +
+								 str(curr_write_retrans).lstrip() + '\n')
 				out_files['127.0.0.1'].write(standard_line)
 				standard_line = ''
 			elif verbose:
-				verbose_line += '|' + str(curr_write_rtt).lstrip() + '|' + str(curr_read_retrans).lstrip() + '|' + str(curr_write_retrans).lstrip() + '\n'
+				verbose_line += ('|' + str(curr_write_rtt).lstrip() + '|' + str(curr_read_retrans).lstrip() + '|' +
+								str(curr_write_retrans).lstrip() + '\n')
 				out_files['127.0.0.1'].write(verbose_line)
 				verbose_line = ''
 

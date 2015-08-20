@@ -31,7 +31,7 @@ MA 02110-1301 USA
 ########################################################################################################################
 import sys
 import os
-from lib.pyostat_functions import iostat_command, verbose_seen
+from lib.pyostat_functions import iostat_command, verbose_seen, display_output
 from lib.pyostat_device import out_files
 
 
@@ -44,11 +44,18 @@ def main():
 		iostat_command()
 	except KeyboardInterrupt:
 		print('Caught ^C... exiting...')
-		out_files['127.0.0.1'].write('###### END VERBOSE OUTPUT ######\n')
-		sys.exit(1)
+		if verbose_seen:
+			out_files['127.0.0.1'].write('###### END VERBOSE OUTPUT ######\n')
+			sys.exit(1)
+		elif display_output:
+			out_files['127.0.0.1'].write('###### END STANDARD OUTPUT ######\n')
+			sys.exit(1)
 
 	if verbose_seen:
 		out_files['127.0.0.1'].write('###### END VERBOSE OUTPUT ######\n')
+		sys.exit(0)
+	elif display_output:
+		out_files['127.0.0.1'].write('###### END STANDARD OUTPUT ######\n')
 		sys.exit(0)
 
 

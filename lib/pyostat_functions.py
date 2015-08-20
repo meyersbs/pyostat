@@ -156,7 +156,7 @@ def iostat_command():
 							 help="disables all output to stdout")
 	parser.add_option_group(display_group)
 	verbose_group = OptionGroup(parser, "Verbose Options",
-								"Standard output is written to \'all_ip_mounts.out\' unless '-v' is specified.")
+								"Standard output is written to 'all_ip_mounts.out' unless '-v' is specified.")
 	verbose_group.add_option('-v', '--verbose', action="store_const", dest="which", const=1,
 						     help="displays unaveraged statistics in stdout and writes them to 'all_ip_mounts.out'")
 	parser.add_option_group(verbose_group)
@@ -190,7 +190,7 @@ def iostat_command():
 		elif not interval_seen:
 			try:
 				interval = int(arg)
-			except:
+			except ValueError:
 				print(bad_interval % arg); return
 			if interval > 0:
 				interval_seen = True
@@ -199,7 +199,7 @@ def iostat_command():
 		elif not count_seen:
 			try:
 				count = int(arg)
-			except:
+			except ValueError:
 				print(bad_count % arg); return
 			if count > 0:
 				count_seen = True
