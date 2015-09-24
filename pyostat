@@ -1,12 +1,8 @@
 #!/usr/bin/env python
 
-########################################################################################################################
 # DETAILS ##############################################################################################################
-########################################################################################################################
 # @author: 	Benjamin S. Meyers
-# @email:	lion.logic.org@gmail.com
-########################################################################################################################
-# COPYRIGHT INFORMATION ################################################################################################
+# @email:	bsm9339@rit.edu
 ########################################################################################################################
 __copyright__ = """
 Copyright (C) 2015, Benjamin S. Meyers <bsm9339@rit.edu>
@@ -26,43 +22,74 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301 USA
 """
 
-########################################################################################################################
 # IMPORTS ##############################################################################################################
-########################################################################################################################
-import sys, os
-from lib.pyostat_functions import iostat_command, verbose_seen, display_output
-from lib.pyostat_device import out_files, set_path
+import sys, datetime, time, syslog
+from pyostat_functions import run_iostat, set_display_output
+from pyostat_device import set_out_file
 
+# GLOBAL VARIABLES #####################################################################################################
+USAGE = "\nCommand line arguments should follow the form:\n"
+USAGE += "\tpyostat -q <y/n> -i <interval> -c <count> -o <filename>\n"
+USAGE += "\t-q:\tif 'y' then print errors to stderr only.\n"
+USAGE += "\t\tif 'n' then print errors to stdout and stderr.\n"
+USAGE += "\t-i:\tthe time to wait before pulling more stats, in seconds.\n"
+USAGE += "\t-c:\tthe number of times to pull stats.\n"
+USAGE += "\t\tif '0', then pull stats forever."
+USAGE += "\t-o:\t(OPTIONAL) the name of a file you would like to additionally write to.\n"
+QUIET_FLAG, INTERVAL, COUNT = '', '', ''
 
-########################################################################################################################
 # MAIN #################################################################################################################
-########################################################################################################################
 def main():
-	last_arg = sys.argv[-1]
-	if os.path.isdir(last_arg) or last_arg == '':
-		if last_arg != '' and last_arg[-1] != '/':
-			last_arg += '/'
-		set_path(last_arg)
+	global INTERVAL, COUNT, QUIET_FLAG, USAGE
+	syslog.openlog("pyostat")
+	args = sys.argv
+	if len(args) < 7 or len(args) == 8:
+		sys.exit("WARNING: Not enough arguments." + USAGE)
+	elif len(args) > 9:
+		sys.exit("WARNING: Too many arguments." + USAGE)
+	else:
+		QUIET_FLAG, INTERVAL, COUNT = args[2], args[4], args[6]
+		if args[1] != '-q' or args[3] != '-i' or args[5] != '-c':
+			sys.exit("WARNING: Invalid command line argument." + USAGE)
+		elif QUIET_FLAG != 'y' and QUIET_FLAG != 'n':
+			sys.exit("WARNING: Invalid output argument." + USAGE)
+		else:
+			try:
+				INTERVAL = int(INTERVAL)
+			except ValueError:
+				sys.exit("WARNING: Invalid interval argument." + USAGE)
+			try:
+				COUNT = int(COUNT)
+			except ValueError:
+				sys.exit("WARNING: Invalid count argument." + USAGE)
+			if INTERVAL < 0:
+				sys.exit("WARNING: Invalid interval argument." + USAGE)
+			if COUNT < 0:
+				sys.exit("WARNING: Invalid count argument." + USAGE)
+			if QUIET_FLAG == 'y':
+				set_display_output(False)
+			else:
+				set_display_output(True)
+			if len(args) == 9 and args[7] != '-o':
+				sys.exit("WARNING: Invalid command line argument." + USAGE)
+			elif len(args) == 9 and args[7] == '-o':
+				set_out_file(args[8])
 
-	prog = os.path.basename(sys.argv[0])
 	try:
-		iostat_command(prog)
+		run_iostat(INTERVAL, COUNT)
 	except KeyboardInterrupt:
-		print('Caught ^C... exiting...')
-		if verbose_seen:
-			out_files['127.0.0.1'].write('###### END VERBOSE OUTPUT ######\n')
-			sys.exit(1)
-		elif display_output:
-			out_files['127.0.0.1'].write('###### END STANDARD OUTPUT ######\n')
-			sys.exit(1)
-
-	if verbose_seen:
-		out_files['127.0.0.1'].write('###### END VERBOSE OUTPUT ######\n')
+		print('\nCaught ^C at: ' + datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S'))
+		syslog.syslog(syslog.LOG_WARNING, 'Caught ^C at: ' + str(int(time.mktime(datetime.datetime.now().timetuple()))))
 		sys.exit(0)
-	elif display_output:
-		out_files['127.0.0.1'].write('###### END STANDARD OUTPUT ######\n')
+	except MemoryError:
+		syslog.syslog(syslog.LOG_ALERT, 'Caught MemoryError at : ' + str(int(time.mktime(datetime.datetime.now().timetuple()))))
 		sys.exit(0)
-
+	except OverflowError:
+		syslog.syslog(syslog.LOG_ALERT, 'Caught OverflowError at : ' + str(int(time.mktime(datetime.datetime.now().timetuple()))))
+		sys.exit(0)
+	except RuntimeError:
+		syslog.syslog(syslog.LOG_ALERT, 'Caught RuntimeError at : ' + str(int(time.mktime(datetime.datetime.now().timetuple()))))
+		sys.exit(0)
 
 if __name__ == "__main__":
 	main()
