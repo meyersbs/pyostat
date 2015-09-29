@@ -6,9 +6,8 @@ A simple command line script for logging read/write statistics for various Linux
 
 ## Usage
 ``` bash
-    $ pyostat <interval> <count> <option> <option>
+    $ pyostat -q <y/n> -i <interval> -c <count> -o <optional_output_file>
     $ pyostat --help
-    $ pyostat --version
 ```
 
 ## Acknowledgment
