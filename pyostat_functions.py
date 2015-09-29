@@ -139,7 +139,7 @@ def run_iostat(interval, count):
 		while count != 0:
 			print_iostat_summary(old_mountstats, mountstats, devices)
 			old_mountstats = mountstats
-			print('#### PYOSTAT IS RUNNING #### ' + datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S'))
+			#print('#### PYOSTAT IS RUNNING #### ' + datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S'))
 			time.sleep(interval)
 			mountstats = parse_stats_file(MOUNTSTATS_PATH)
 			devices = list_nfs_mounts(original_devices, mountstats) # Recheck devices for automount adds/drops
@@ -150,7 +150,7 @@ def run_iostat(interval, count):
 		while True:
 			print_iostat_summary(old_mountstats, mountstats, devices)
 			old_mountstats = mountstats
-			print('#### PYOSTAT IS RUNNING #### ' + datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S'))
+			#print('#### PYOSTAT IS RUNNING #### ' + datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S'))
 			time.sleep(interval)
 			mountstats = parse_stats_file(MOUNTSTATS_PATH)
 			devices = list_nfs_mounts(original_devices, mountstats) # Recheck devices for automount adds/drops

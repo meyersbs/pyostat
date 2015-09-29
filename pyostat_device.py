@@ -46,6 +46,7 @@ def stop_collecting():
 	COLLECTING = False
 
 def set_out_file(filename):
+	""" Try to set an optional output file. """
 	global OUTFILE
 	if os.path.exists(filename):
 		try:
@@ -105,17 +106,13 @@ def print_to_stdout():
 	elif not pyostat_functions.DISPLAY_OUTPUT:
 		for key in sorted(OUT_DATA):
 			STANDARD_LINE = ('- nfs.read.RTR[' + OUT_DATA[key][1] + '] ' + OUT_DATA[key][0] + ' ' + OUT_DATA[key][4])
-			if OUT_DATA[key][4] != '0.0':
-				print(STANDARD_LINE)
+			print(STANDARD_LINE)
 			STANDARD_LINE = ('- nfs.read.RTT[' + OUT_DATA[key][1] + '] ' + OUT_DATA[key][0] + ' ' + OUT_DATA[key][2])
-			if OUT_DATA[key][2] != '0.0':
-				print(STANDARD_LINE)
+			print(STANDARD_LINE)
 			STANDARD_LINE = ('- nfs.write.RTR[' + OUT_DATA[key][1] + '] ' + OUT_DATA[key][0] + ' ' + OUT_DATA[key][5])
-			if OUT_DATA[key][5] != '0.0':
-				print(STANDARD_LINE)
+			print(STANDARD_LINE)
 			STANDARD_LINE = ('- nfs.write.RTT[' + OUT_DATA[key][1] + '] ' + OUT_DATA[key][0] + ' ' + OUT_DATA[key][3])
-			if OUT_DATA[key][3] != '0.0':
-				print(STANDARD_LINE)
+			print(STANDARD_LINE)
 			shares = str(len(OUT_DATA[key][6]))
 			STANDARD_LINE = ('- nfs.shares[' + OUT_DATA[key][1] + '] ' + OUT_DATA[key][0] + ' ' + shares)
 			print(STANDARD_LINE)
@@ -245,10 +242,10 @@ class DeviceData:
 		retransmits = '{0:>10.0f}'.format(retrans).strip()
 		if op.lower() == 'read:':
 			CURR_READ_RTX = format(retransmits, '>16')
-			CURR_READ_RTT = format(rtt_per_op, '>16.3f')
+			CURR_READ_RTT = format(rtt_per_op, '>16.8f')
 		elif op.lower() == 'write:':
 			CURR_WRITE_RTX = format(retransmits, '>16')
-			CURR_WRITE_RTT = format(rtt_per_op, '>16.3f')
+			CURR_WRITE_RTT = format(rtt_per_op, '>16.8f')
 
 	def __set_curr_ip(self):
 		"""
